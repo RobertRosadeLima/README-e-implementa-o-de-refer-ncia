@@ -769,9 +769,10 @@ O primeiro gráfico ilustra a Taxa de Sucesso e a Distribuição de Rotas do gra
 Estes gráficos representam os dados que a sua API FastAPI pode coletar salvando logs de auditoria no PostgreSQL. Deseja que eu crie o script de consultas SQL que extraem essas métricas do banco de dados para alimentar um dashboard real (como o Streamlit ou PowerBI), ou gostaria de simular um cenário de teste de carga para ver como o grafo se comporta sob estresse?
 
 
+ospc archive
 
 
-
+Agenda de Prazos Jurídicos
 
 
 
