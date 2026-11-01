@@ -1,0 +1,63 @@
+A Estrutura de uma spec.md A Estrutura de uma spec.md
+
+# Spec: Sistema de Agenda de Prazos Processuais (Python)
+
+## 1. Contexto e Tecnologia
+* **Objetivo:** Criar um sistema de gerenciamento de prazos jurídicos.
+* **Tecnologia:** Linguagem Python 3 (Interface gráfica simplificada com a biblioteca `tkinter` ou baseada em terminal/web com `Flask`).
+
+## 2. Requisitos Funcionais
+* [RF01] Cadastrar prazo com: Número do Processo, Nome do Cliente e Data de Vencimento.
+* [RF02] Listar os prazos cadastrados na tela.
+
+## 3. Regras de Negócio
+* **RN01 - Alerta de Urgência:** Se o prazo vencer em 3 dias ou menos, exibir um aviso visual de "CRÍTICO".
+* **RN02 - Validação de Data:** Impedir o cadastro de datas passadas (comparando com a data atual do sistema).
+* **RN03 - Persistência em Arquivo:** Em vez de LocalStorage (que é para navegadores), os dados devem ser salvos em um arquivo local chamado `prazos.json` sempre que um prazo for adicionado ou removido.
+
+import json
+from datetime import datetime
+
+# A IA cria essa função para salvar seus prazos em um arquivo de texto
+def salvar_prazos(lista_de_prazos):
+    with open('prazos.json', 'w') as arquivo:
+        json.dump(lista_de_prazos, arquivo)
+
+# A IA cria essa função para carregar os prazos quando o programa abre
+def carregar_prazos():
+    try:
+        with open('prazos.json', 'r') as arquivo:
+            return json.load(arquivo)
+    except FileNotFoundError:
+        return [] # Se o arquivo não existir ainda, começa com uma lista vazia
+
+ospc init && ospc propose -y && ospc apply -y
+
+# Spec: Sistema de Agenda de Prazos Processuais Web
+
+## 1. Contexto e Tecnologia
+* **Objetivo:** Criar uma aplicação web para advogados gerenciarem prazos processuais críticos.
+* **Backend:** Python com Flask para servir a aplicação.
+* **Frontend:** HTML, CSS (Bootstrap para visual limpo) e JavaScript para interações em tempo real.
+
+## 2. Requisitos Funcionais (O que o sistema FAZ)
+* [RF01] Cadastrar prazo com os campos: Número do Processo, Nome do Cliente e Data de Vencimento.
+* [RF02] Listar os prazos cadastrados em uma tabela organizada por ordem cronológica.
+* [RF03] Botão para marcar o prazo como "Concluído", removendo-o da listagem ativa.
+
+## 3. Regras de Negócio (Como o sistema COMPORTA-SE)
+* **RN01 - Alerta de Urgência:** Se o prazo vencer em 3 dias ou menos, a linha da tabela deve ganhar um destaque visual vermelho com a tag "CRÍTICO".
+* **RN02 - Validação de Data:** O formulário não deve aceitar o cadastro de prazos com datas anteriores a hoje. Exibir alerta: "Não é possível cadastrar prazos no passado".
+* **RN03 - Persistência em LocalStorage:** Toda a lista de prazos deve ser salva e recuperada via LocalStorage no navegador pelo JavaScript frontend. O Python apenas renderiza a página inicial.
+
+## 4. Design e Layout (UI/UX)
+* **Estilo:** Visual corporativo jurídico, limpo, utilizando tons de azul escuro e branco.
+* **Componentes:** Um card superior ou lateral com o formulário de cadastro, e uma tabela central para a exibição dos prazos.
+
+ospc init && ospc propose -y && ospc apply -y
+
+python app.py
+
+flask run
+
+ * Running on http://127.0.0.1:5000 / http://localhost:5000
