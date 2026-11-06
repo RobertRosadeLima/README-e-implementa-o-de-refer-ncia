@@ -1,0 +1,468 @@
+import streamlit as st
+import google.genai as genai
+import pandas as pd
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="FitAI - Saúde Inteligente", page_icon="🏋️‍♂️", layout="wide")
+
+st.title("🏋️‍♂️ FitAI - Seu Personal Trainer & Nutricionista com IA")
+st.markdown("Preencha seus dados e nossa IA criará um cronograma completo de treinos e planejamento alimentar sob medida.")
+
+# 2. CONEXÃO SEGURA COM A IA
+try:
+    CHAVE_SEGURA = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=CHAVE_SEGURA)
+except Exception:
+    st.error("❌ Erro de Configuração: A chave 'GEMINI_API_KEY' não foi encontrada nas Secrets.")
+    st.stop()
+
+# 3. INTERFACE VISUAL EM COLUNAS
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("📊 Seus Dados")
+    peso = st.number_input("Seu peso (kg):", min_value=30.0, max_value=200.0, value=70.0, step=0.1)
+    altura = st.number_input("Sua altura (metros, ex: 1.75):", min_value=1.0, max_value=2.5, value=1.70, step=0.01)
+    objetivo = st.selectbox("Qual o seu objetivo principal?", ["Ganho de Massa Muscular (Hipertrofia)", "Emagrecimento / Definição", "Condicionamento Físico / Saúde"])
+
+with col2:
+    st.subheader("⚙️ Suas Rotinas")
+    dias_treino = st.slider("Quantos dias você pode treinar na semana?", min_value=1, max_value=7, value=4)
+    restricoes = st.text_input("Restrição alimentar ou médica? (ex: Vegano, intolerante a lactose, dor no joelho):", value="Nenhuma")
+
+# Cálculo tradicional de IMC via código Python
+imc = peso / (altura ** 2)
+
+# 4. BOTÃO DE GERAÇÃO INTELIGENTE
+if st.button("Gerar Meu Cronograma de Saúde Completo 🚀"):
+    with st.spinner("🤖 O time de especialistas em IA está montando seu plano..."):
+        
+        # PROMPT AVANÇADO: Exigindo que a IA monte os dados divididos por separadores técnicos
+        prompt_saude = f"""
+        Você é um Personal Trainer e Nutricionista Esportivo de elite.
+        Monte um plano para um cliente com as características:
+        - Peso: {peso}kg | Altura: {altura}m | IMC calculado pelo sistema: {imc:.2f}
+        - Objetivo: {objetivo}
+        - Dias disponíveis para treinar: {dias_treino} dias na semana
+        - Restrições/Observações: {restricoes}
+
+        Por favor, formate sua resposta estritamente seguindo estes blocos de texto:
+        Use o marcador [TREINO] antes de detalhar a rotina de treinos dividida pelos dias.
+        Use o marcador [DIETA] antes de detalhar o cardápio (Café, Almoço, Lanche, Jantar) adaptado às restrições.
+        Use o marcador [CONSELHO] para dar uma dica de motivação ou cuidado com as articulações/saúde.
+        """
+        
+        try:
+            resposta = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt_saude,
+            )
+            
+            texto_completo = resposta.text
+            
+            # Engenharia de Software Tradicional fatiando a resposta da IA (Parsing)
+            partes = {}
+            atual = "INTRO"
+            linhas = texto_completo.split("\n")
+            
+            conteudo_bloco = []
+            for linha in linhas:
+                if "[TREINO]" in linha:
+                    partes[atual] = "\n".join(conteudo_bloco)
+                    atual = "TREINO"
+                    conteudo_bloco = []
+                elif "[DIETA]" in linha:
+                    partes[atual] = "\n".join(conteudo_bloco)
+                    atual = "DIETA"
+                    conteudo_bloco = []
+                elif "[CONSELHO]" in pointer if "[CONSELHO]" in linha:
+                    partes[atual] = "\n".join(conteudo_bloco)
+                    atual = "CONSELHO"
+                    conteudo_bloco = []
+                else:
+                    conteudo_bloco.append(linha)
+            partes[atual] = "\n".join(conteudo_bloco)
+
+            # 5. EXIBIÇÃO ORGANIZADA DO RESULTADO NA TELA (Métricas e Abas)
+            st.success("🎉 Seu plano personalizado ficou pronto!")
+            
+            # Bloco de Métricas Tradicionais
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Seu IMC", f"{imc:.1f}")
+            if imc < 24.9:
+                c2.metric("Classificação", "Peso Ideal")
+            else:
+                c2.metric("Classificação", "Atenção / Sobrepeso")
+            c3.metric("Frequência Alvo", f"{dias_treino}x por semana")
+
+            # Criação de abas visuais na interface
+            aba_treino, aba_dieta, aba_conselho = st.tabs(["💪 Cronograma de Treino", "🍽️ Planejamento Alimentar", "💡 Dica do Especialista"])
+            
+            with aba_treino:
+                st.write(partes.get("TREINO", partes.get("INTRO", "Erro ao carregar o treino.")))
+            with aba_dieta:
+                st.write(partes.get("DIETA", "Erro ao carregar a dieta."))
+            with aba_conselho:
+                st.write(partes.get("CONSELHO", "Foque na constância!"))
+                
+        except Exception as e:
+            st.error(f"Erro ao processar as informações: {e}")
+
+partes = {}
+atual = "INTRO"
+linhas = texto_completo.split("\n")
+
+conteudo_bloco = []
+for linha in linhas:
+    if "[TREINO]" in linha:
+        partes[atual] = "\n".join(conteudo_bloco)
+        atual = "TREINO"
+        conteudo_bloco = []
+    # ... (continua para [DIETA] e [CONSELHO])
+
+streamlit
+google-genai
+pandas
+
+# ==========================================
+# 1. PREENCHA SUAS INFORMAÇÕES DO GITHUB AQUI
+# ==========================================
+USUARIO_GITHUB = "SEU_USUARIO_AQUI"
+EMAIL_GITHUB = "seu_email@email.com"
+TOKEN_GITHUB = "seu_token_github_aqui"  # O mesmo token (PAT) gerado no projeto do café
+NOME_REPOSITORIO = "fit-ai-gerador"     # Nome deste novo projeto no seu perfil
+
+# ==========================================
+# 2. ESTRUTURANDO OS ARQUIVOS DO NOVO APP
+# ==========================================
+# Configurando as credenciais locais do Git
+!git config --global user.name "{USUARIO_GITHUB}"
+!git config --global user.email "{EMAIL_GITHUB}"
+
+# Criando a pasta dedicada para o FitAI
+!mkdir -p {NOME_REPOSITORIO}
+
+# Se o seu código do FitAI já estiver salvo no Colab como app.py, movemos ele para a pasta
+!mv app.py {NOME_REPOSITORIO}/ 2>/dev/null || cp app.py {NOME_REPOSITORIO}/
+
+# Entrando na nova pasta do projeto
+%cd {NOME_REPOSITORIO}
+
+# Criando o arquivo requirements.txt automaticamente
+with open("requirements.txt", "w") as f:
+    f.write("streamlit\ngoogle-genai\npandas\n")
+
+# Criando o README.md de apresentação para este segundo projeto
+readme_content = f"""# 🏋️‍♂️ FitAI - Seu Personal Trainer & Nutricionista com IA
+
+O **FitAI** é um aplicativo web em **Python** que atua como um assistente inteligente de saúde e bem-estar. 
+
+Utilizando a API do **Google Gemini**, o sistema funde cálculos clássicos de saúde (como o IMC) com lógica de inteligência artificial multimodal e estruturação de texto customizada para gerar rotinas completas de exercícios e nutrição.
+
+## 🛠️ Tecnologias Utilizadas
+- Python
+- Streamlit (Interface em abas e colunas responsivas)
+- Google GenAI SDK (Gemini 2.5 Flash)
+- Pandas (Tratamento estruturado de dados)
+
+## 🎯 Diferencial Técnico (Portfólio)
+Diferente de aplicações básicas que exibem respostas brutas de IA, este projeto implementa um **algoritmo de Parsing (fatiamento de strings)** em Python. A resposta mista da LLM é mapeada, fatiada e distribuída dinamicamente em abas visuais interativas de forma 100% limpa para o usuário final.
+"""
+with open("README.md", "w") as f:
+    f.write(readme_content)
+
+# ==========================================
+# 3. PUBLICANDO NO GITHUB
+# ==========================================
+# Inicializa o repositório com a branch principal recomendada (main)
+!git init -b main
+
+# Adiciona os arquivos estruturados do FitAI
+!git add .
+
+# Registra a versão inicial
+!git commit -m "Initial commit: Estrutura completa do FitAI com tratamento de abas"
+
+# Define o endereço do seu novo repositório com segurança
+URL_REMOTA = f"https://{TOKEN_GITHUB}@://github.com{USUARIO_GITHUB}/{NOME_REPOSITORIO}.git"
+!git remote add origin {URL_REMOTA} 2>/dev/null || git remote set-url origin {URL_REMOTA}
+
+# Envia os dados para as nuvens do GitHub
+print("\n📤 Subindo o FitAI para o GitHub...")
+!git push -u origin main --force
+print(f"\n🎉 SUCESSO! O FitAI já está no seu perfil: https://://github.com{USUARIO_GITHUB}/{NOME_REPOSITORIO}")
+
+import streamlit as st
+import google.genai as genai
+import sqlite3
+import pandas as pd
+from datetime import datetime
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="FitAI Pro - Banco de Dados", page_icon="🏋️‍♂️", layout="wide")
+
+st.title("🏋️‍♂️ FitAI Pro - Com Histórico Permanente em Banco de Dados")
+st.markdown("Seus treinos e dietas inteligentes gerados por IA agora ficam guardados para sempre!")
+
+# ==========================================
+# 2. CONFIGURAÇÃO DO BANCO DE DADOS (SQLite)
+# ==========================================
+def conectar_banco():
+    # Cria (ou abre) o arquivo fisica de banco de dados no servidor
+    conexao = sqlite3.connect("historico_saude.db")
+    cursor = conexao.cursor()
+    # Cria a tabela caso ela ainda não exista no arquivo
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS planos_saude (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            data_criacao TEXT,
+            objetivo TEXT,
+            treino TEXT,
+            dieta TEXT
+        )
+    """)
+    conexao.commit()
+    return conexao
+
+# Inicializa o banco de dados na inicialização do app
+conexao = conectar_banco()
+
+# 3. CONEXÃO SEGURA COM A IA
+try:
+    CHAVE_SEGURA = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=CHAVE_SEGURA)
+except Exception:
+    st.error("❌ Erro de Configuração: A chave 'GEMINI_API_KEY' não foi encontrada nas Secrets.")
+    st.stop()
+
+# 4. INTERFACE VISUAL DE ENTRADA
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("📊 Seus Dados")
+    peso = st.number_input("Seu peso (kg):", min_value=30.0, max_value=200.0, value=70.0, step=0.1)
+    altura = st.number_input("Sua altura (m):", min_value=1.0, max_value=2.5, value=1.70, step=0.01)
+    objetivo = st.selectbox("Qual o seu objetivo?", ["Ganho de Massa Muscular", "Emagrecimento", "Condicionamento Físico"])
+
+with col2:
+    st.subheader("⚙️ Suas Rotinas")
+    dias_treino = st.slider("Dias para treinar na semana:", min_value=1, max_value=7, value=4)
+    restricoes = st.text_input("Restrições alimentares ou médicas:", value="Nenhuma")
+
+imc = peso / (altura ** 2)
+
+# 5. LOGICA DE GERAÇÃO E PERSISTÊNCIA (GRAVAÇÃO)
+if st.button("Gerar e Salvar Meu Cronograma Permanente 🚀"):
+    with st.spinner("🤖 O time de IA está montando seu plano..."):
+        
+        prompt_saude = f"""
+        Você é um Personal Trainer e Nutricionista de elite.
+        Monte um plano para um cliente com: Peso: {peso}kg | Altura: {altura}m | IMC: {imc:.2f}. Objetivo: {objetivo}. Dias: {dias_treino}. Restrições: {restricoes}.
+        Use o marcador [TREINO] antes da rotina de exercícios.
+        Use o marcador [DIETA] antes do cardápio alimentar diário.
+        """
+        
+        try:
+            resposta = client.models.generate_content(model='gemini-2.5-flash', contents=prompt_saude)
+            texto_completo = resposta.text
+            
+            # Algoritmo de Parsing para isolar Treino e Dieta
+            partes = {"TREINO": "Erro ao gerar", "DIETA": "Erro ao gerar"}
+            atual = "INTRO"
+            for linha in texto_completo.split("\n"):
+                if "[TREINO]" in linha: atual = "TREINO"; partes[atual] = ""
+                elif "[DIETA]" in linha: atual = "DIETA"; partes[atual] = ""
+                elif atual in partes: partes[atual] += linha + "\n"
+
+            # ---- GRAVANDO NO BANCO DE DADOS REAL ----
+            cursor = conexao.cursor()
+            data_atual = datetime.now().strftime("%d/%m/%Y %H:%M")
+            cursor.execute("""
+                INSERT INTO planos_saude (data_criacao, objetivo, treino, dieta)
+                VALUES (?, ?, ?, ?)
+            """, (data_atual, objetivo, partes["TREINO"].strip(), partes["DIETA"].strip()))
+            conexao.commit()
+            
+            st.success("🎉 Seu plano foi gerado e salvo permanentemente no banco de dados!")
+            st.rerun() # Atualiza a tela para exibir o novo plano no histórico abaixo
+            
+        except Exception as e:
+            st.error(f"Erro ao processar as informações: {e}")
+
+# ==========================================
+# 6. EXIBIÇÃO DO HISTÓRICO SALVO DO BANCO
+# ==========================================
+st.markdown("---")
+st.markdown("### 📜 Seu Histórico Permanente de Planos Gerados")
+
+# Lê os dados do banco usando o Pandas de forma direta e elegante
+df_historico = pd.read_sql_query("SELECT id, data_criacao AS 'Data', objetivo AS 'Objetivo' FROM planos_saude ORDER BY id DESC", conexao)
+
+if not df_historico.empty:
+    # Mostra uma tabela compacta de registros para o usuário escolher qual plano quer abrir
+    st.dataframe(df_historico, use_container_width=True, hide_index=True)
+    
+    # Caixa de seleção para o usuário escolher o ID do histórico que quer visualizar em detalhes
+    id_selecionado = st.number_input("Digite o ID do plano acima que você deseja abrir detalhadamente:", min_value=int(df_historico['id'].min()), max_value=int(df_historico['id'].max()), value=int(df_historico['id'].max()))
+    
+    # Busca no banco os dados textuais longos do ID selecionado
+    cursor = conexao.cursor()
+    cursor.execute("SELECT treino, dieta FROM planos_saude WHERE id = ?", (id_selecionado,))
+    plano_focado = cursor.fetchone()
+    
+    if plano_focado:
+        st.markdown(f"#### 🔍 Detalhes do Plano ID #{id_selecionado}")
+        aba_t, aba_d = st.tabs(["💪 Treino Escolhido", "🍽️ Dieta Escolhida"])
+        with aba_t: st.write(plano_focado[0])
+        with aba_d: st.write(plano_focado[1])
+else:
+    st.info("Nenhum histórico permanente encontrado no banco de dados ainda. Gere seu primeiro plano acima!")
+
+import streamlit as st
+import google.genai as genai
+import sqlite3
+import pandas as pd
+from datetime import datetime
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="FitAI Pro - Export", page_icon="🏋️‍♂️", layout="wide")
+
+st.title("🏋️‍♂️ FitAI Pro - Com Exportação de Treinos e Dieta")
+st.markdown("Gere seu plano de saúde com IA e faça o download direto para o seu celular!")
+
+# 2. CONFIGURAÇÃO DO BANCO DE DADOS (SQLite)
+def conectar_banco():
+    conexao = sqlite3.connect("historico_saude.db")
+    cursor = conexao.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS planos_saude (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            data_criacao TEXT,
+            objetivo TEXT,
+            treino TEXT,
+            dieta TEXT
+        )
+    """)
+    conexao.commit()
+    return conexao
+
+conexao = conectar_banco()
+
+# 3. CONEXÃO SEGURA COM A IA
+try:
+    CHAVE_SEGURA = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=CHAVE_SEGURA)
+except Exception:
+    st.error("❌ Erro de Configuração: A chave 'GEMINI_API_KEY' não foi encontrada nas Secrets.")
+    st.stop()
+
+# 4. INTERFACE VISUAL DE ENTRADA
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("📊 Seus Dados")
+    peso = st.number_input("Seu peso (kg):", min_value=30.0, max_value=200.0, value=70.0, step=0.1)
+    altura = st.number_input("Sua altura (m):", min_value=1.0, max_value=2.5, value=1.70, step=0.01)
+    objetivo = st.selectbox("Qual o seu objetivo?", ["Ganho de Massa Muscular", "Emagrecimento", "Condicionamento Físico"])
+
+with col2:
+    st.subheader("⚙️ Suas Rotinas")
+    dias_treino = st.slider("Dias para treinar na semana:", min_value=1, max_value=7, value=4)
+    restricoes = st.text_input("Restrições alimentares ou médicas:", value="Nenhuma")
+
+imc = peso / (altura ** 2)
+
+# 5. LOGICA DE GERAÇÃO E PERSISTÊNCIA
+if st.button("Gerar e Salvar Meu Cronograma 🚀"):
+    with st.spinner("🤖 O time de IA está montando seu plano..."):
+        
+        prompt_saude = f"""
+        Você é um Personal Trainer e Nutricionista de elite.
+        Monte um plano para um cliente com: Peso: {peso}kg | Altura: {altura}m | IMC: {imc:.2f}. Objetivo: {objetivo}. Dias: {dias_treino}. Restrições: {restricoes}.
+        Use o marcador [TREINO] antes da rotina de exercícios.
+        Use o marcador [DIETA] antes do cardápio alimentar diário.
+        """
+        
+        try:
+            resposta = client.models.generate_content(model='gemini-2.5-flash', contents=prompt_saude)
+            texto_completo = resposta.text
+            
+            partes = {"TREINO": "Erro ao gerar", "DIETA": "Erro ao gerar"}
+            atual = "INTRO"
+            for linha in texto_completo.split("\n"):
+                if "[TREINO]" in linha: atual = "TREINO"; partes[atual] = ""
+                elif "[DIETA]" in linha: atual = "DIETA"; partes[atual] = ""
+                elif atual in partes: partes[atual] += linha + "\n"
+
+            cursor = conexao.cursor()
+            data_atual = datetime.now().strftime("%d/%m/%Y %H:%M")
+            cursor.execute("""
+                INSERT INTO planos_saude (data_criacao, objetivo, treino, dieta)
+                VALUES (?, ?, ?, ?)
+            """, (data_atual, objetivo, partes["TREINO"].strip(), partes["DIETA"].strip()))
+            conexao.commit()
+            
+            st.success("🎉 Seu plano foi gerado e salvo permanentemente!")
+            st.rerun()
+            
+        except Exception as e:
+            st.error(f"Erro ao processar as informações: {e}")
+
+# ==========================================
+# 6. EXIBIÇÃO E BOTÃO DE EXPORTAÇÃO
+# ==========================================
+st.markdown("---")
+st.markdown("### 📜 Seu Histórico Permanente de Planos Gerados")
+
+df_historico = pd.read_sql_query("SELECT id, data_criacao AS 'Data', objetivo AS 'Objetivo' FROM planos_saude ORDER BY id DESC", conexao)
+
+if not df_historico.empty:
+    st.dataframe(df_historico, use_container_width=True, hide_index=True)
+    
+    id_selecionado = st.number_input("Digite o ID do plano que deseja abrir e exportar:", min_value=int(df_historico['id'].min()), max_value=int(df_historico['id'].max()), value=int(df_historico['id'].max()))
+    
+    cursor = conexao.cursor()
+    cursor.execute("SELECT data_criacao, objetivo, treino, dieta FROM planos_saude WHERE id = ?", (id_selecionado,))
+    plano_focado = cursor.fetchone()
+    
+    if plano_focado:
+        data_plano, obj_plano, treino_texto, dieta_texto = plano_focado
+        
+        st.markdown(f"#### 🔍 Detalhes do Plano ID #{id_selecionado} (Gerado em: {data_plano})")
+        
+        # ---- NOVO: PREPARANDO O TEXTO PARA EXPORTAÇÃO ----
+        texto_exportacao = f"""==================================================
+FITAI PRO - SEU CRONOGRAMA DE SAÚDE INTELIGENTE
+Gerado em: {data_plano} | Objetivo: {obj_plano}
+==================================================
+
+💪 CRONOGRAMA DE TREINO:
+{treino_texto}
+
+==================================================
+
+🍽️ PLANEJAMENTO ALIMENTAR:
+{dieta_texto}
+"""
+        
+        # Criando abas para visualização limpa
+        aba_t, aba_d, aba_e = st.tabs(["💪 Treino", "🍽️ Dieta", "📥 Exportar Plano"])
+        
+        with aba_t:
+            st.write(treino_texto)
+        with aba_d:
+            st.write(dieta_texto)
+        with aba_e:
+            st.subheader("Salvar arquivo no dispositivo")
+            st.info("Clique no botão abaixo para baixar seu plano de saúde completo formatado em formato de texto estruturado compatível com qualquer celular.")
+            
+            # COMPONENTE DE DOWNLOAD NATIVO DO STREAMLIT
+            st.download_button(
+                label="📥 Baixar Plano Completo (.txt)",
+                data=texto_exportacao,
+                file_name=f"plano_fitai_id_{id_selecionado}.txt",
+                mime="text/plain"
+            )
+else:
+    st.info("Nenhum histórico permanente encontrado no banco de dados ainda.")
+
