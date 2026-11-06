@@ -1,0 +1,500 @@
+# 1. Instalando a biblioteca oficial do Google Gemini AI
+!pip install -q -U google-genai
+
+# 2. Importando as ferramentas necessárias
+from google.genai import types
+import google.genai as genai
+from google.colab import userdata
+
+# 3. Configurando a chave de acesso (Substitua pelo seu texto ou use o Secrets do Colab)
+# Para este teste rápido, cole sua chave do Google AI Studio entre as aspas abaixo:
+MINHA_CHAVE_IA = "SUA_API_KEY_AQUI" 
+
+client = genai.Client(api_key=MINHA_CHAVE_IA)
+
+# 4. Interação com o usuário
+print("--- GERADOR DE PROJETOS DE SOFTWARE COM IA ---")
+tema_usuario = input("Digite um assunto que você gosta (ex: futebol, culinária, finanças, música): ")
+
+# 5. Criando o comando (prompt) para a Inteligência Artificial
+prompt = f"Crie uma ideia criativa de projeto de software simples em Python sobre o tema: {tema_usuario}. O projeto deve ser adequado para um iniciante do zero."
+
+print("\n🤖 Pensando na sua ideia de projeto...")
+
+# 6. Enviando para o modelo Gemini do Google e exibindo o resultado
+response = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents=prompt,
+)
+
+print("\n💡 IDEIA SUGERIDA PELA IA:")
+print(response.text)
+
+# 5. Criando um comando (prompt) muito mais detalhado e profissional
+prompt = f"""
+Você é um professor sênior de Engenharia de Software. 
+O usuário escolheu o tema "{tema_usuario}".
+
+Faça o seguinte:
+1. Crie uma ideia de projeto simples em Python sobre esse tema.
+2. Escreva o código Python básico inicial desse projeto para o usuário copiar.
+3. Explique brevemente o que as principais linhas do código fazem.
+
+Use um tom encorajador para um iniciante do zero.
+"""
+ print("--- ☕ DIÁRIO DO SOMMELIER DE CAFÉ ---")
+
+# 1. Entrada de dados (O programa conversa com você)
+nome_grao = input("Qual o nome ou marca do café que você está bebendo? ")
+nota = int(input("De 1 a 5, qual nota você dá para o sabor? "))
+comentario = input("Escreva uma palavra sobre o sabor (ex: forte, amargo, frutado, doce): ")
+
+print("\n--- 📊 ANALISANDO SEU CAFÉ ---")
+print(f"Café analisado: {nome_grao}")
+
+# 2. Tomada de decisão tradicional (Estrutura Condicional If/Else)
+if nota >= 4:
+    diagnostico = "Excelente escolha! Esse grão é combustível de alta qualidade para programar."
+elif nota == 3:
+    diagnostico = "Um café honesto. Dá para manter o foco, mas você merece algo melhor."
+else:
+    diagnostico = "Alerta! Esse café parece chá de meia. Vá atrás de um grão gourmet!"
+
+# 3. Exibição do resultado final
+print(f"Nota: {'⭐' * nota}")
+print(f"Estilo: {comentario.upper()}")
+print(f"Diagnóstico da Máquina: {diagnostico}")
+
+# 1. Instalando e importando as ferramentas da IA
+!pip install -q -U google-genai
+import google.genai as genai
+
+# Configuração da chave de acesso (Insira sua API Key aqui)
+MINHA_CHAVE_IA = "SUA_API_KEY_AQUI" 
+client = genai.Client(api_key=MINHA_CHAVE_IA)
+
+print("--- ☕ DIÁRIO DO SOMMELIER DE CAFÉ INTELIGENTE ---")
+
+# 2. ENTRADA TRADICIONAL: Capturando os dados do usuário
+nome_grao = input("Qual o nome ou marca do café que você está bebendo? ")
+nota = input("De 1 a 5, qual nota você dá para o sabor? ")
+comentario = input("Descreva o sabor ou método (ex: amargo, prensa francesa, frutado): ")
+
+print("\n🤖 Enviando dados para o Sommelier de IA...")
+
+# 3. ENGENHARIA DE PROMPT: Criando a instrução contextualizada para a IA
+prompt_sommelier = f"""
+Você é um Sommelier de Café especialista e descontraído. 
+Um usuário acabou de degustar o seguinte café:
+- Nome/Marca do Grão: {nome_grao}
+- Nota dada (de 1 a 5): {nota}/5
+- Comentário do usuário: {comentario}
+
+Com base nesses dados, gere um veredito técnico e divertido de até 3 linhas. 
+Se a nota for baixa, brinque com a situação e sugira como melhorar (mudar a moagem, temperatura da água ou trocar de grão).
+Se a nota for alta, elogie a escolha.
+"""
+
+# 4. INTEGRAÇÃO MODERNA: O código tradicional chama a IA na nuvem
+resposta_ia = client.models.generate_content(
+    model='gemini-2.5-flash',
+    contents=prompt_sommelier,
+)
+
+# 5. SAÍDA DE DADOS: Exibindo o resultado final na tela
+print("\n--- 📊 PARECER DO SOMMELIER IA ---")
+print(f"Café: {nome_grao} | Avaliação: {'⭐' * int(nota)}")
+print("\n📝 Veredito da IA:")
+print(resposta_ia.text)
+
+# 1. INSTALANDO AS BIBLIOTECAS NECESSÁRIAS
+!pip install -q streamlit google-genai pyngrok
+
+# 2. CRIANDO O ARQUIVO DO APLICATIVO WEB
+# O comando abaixo diz para o Colab salvar o código em um arquivo chamado app.py
+%%writefile app.py
+import streamlit as st
+import google.genai as genai
+
+# Configuração da página da web
+st.set_page_config(page_title="Sommelier IA", page_icon="☕", layout="centered")
+
+st.title("☕ Diário do Sommelier de Café Inteligente")
+st.markdown("Diga o que achou do seu café e nossa IA dará um veredito de especialista!")
+
+# Área de configuração da API Key de forma segura na barra lateral
+st.sidebar.header("⚙️ Configuração")
+api_key = st.sidebar.text_input("Cole sua Google API Key:", type="password")
+
+if not api_key:
+    st.info("👋 Por favor, insira sua API Key do Google AI Studio na barra lateral para começar.")
+else:
+    # Inicializa o cliente do Gemini com a chave fornecida
+    client = genai.Client(api_key=api_key)
+
+    # Formulário visual da interface
+    nome_grao = st.text_input("Qual o nome ou marca do café?")
+    nota = st.slider("De 1 a 5, qual nota você dá?", min_value=1, max_value=5, value=3)
+    comentario = st.text_area("Descreva o sabor ou método de preparo:")
+
+    # Botão de envio
+    if st.button("Analisar Café com IA 🚀"):
+        if nome_grao and comentario:
+            with st.spinner("🤖 O Sommelier de IA está degustando e pensando..."):
+                
+                # Montando a instrução para o Gemini
+                prompt = f"""
+                Você é um Sommelier de Café especialista e descontraído. 
+                Um usuário degustou o seguinte café:
+                - Nome/Marca: {nome_grao}
+                - Nota dada: {nota}/5
+                - Comentário: {comentario}
+
+                Gere um veredito técnico e divertido de até 3 linhas sobre essa experiência.
+                """
+                
+                try:
+                    # Chamada de API
+                    resposta = client.models.generate_content(
+                        model='gemini-2.5-flash',
+                        contents=prompt,
+                    )
+                    
+                    # Exibindo o resultado visualmente na tela
+                    st.success("📊 PARECER DO SOMMELIER IA")
+                    st.metric(label=f"Avaliação do {nome_grao}", value="⭐" * nota)
+                    st.write(resposta.text)
+                    
+                except Exception as e:
+                    st.error(f"Erro ao chamar a IA: {e}")
+        else:
+            st.warning("⚠️ Por favor, preencha o nome do grão e o comentário antes de analisar.")
+
+# 3. EXECUTANDO O STREAMLIT E CRIANDO O LINK PÚBLICO
+# Este comando roda o app em segundo plano e expõe o link para você clicar e abrir o site
+import subprocess
+import time
+
+# Executa o streamlit em background
+subprocess.Popen(["streamlit", "run", "app.py", "--server.port", "8501"])
+time.sleep(3)
+
+# Instala e usa o localtunnel para gerar o endereço web acessível
+!npx localtunnel --port 8501
+
+# ==========================================
+# 1. PREENCHA SUAS INFORMAÇÕES DO GITHUB AQUI
+# ==========================================
+USUARIO_GITHUB = "SEU_USUARIO_AQUI"
+EMAIL_GITHUB = "seu_email@email.com"
+TOKEN_GITHUB = "seu_token_github_aqui"  # Aquele token que você gerou nas configurações do GitHub
+NOME_REPOSITORIO = "sommelier-cafe-ia"  # Nome do projeto que aparecerá no seu perfil
+
+# ==========================================
+# 2. CONFIGURANDO O GIT NO COLAB
+# ==========================================
+!git config --global user.name "{USUARIO_GITHUB}"
+!git config --global user.email "{EMAIL_GITHUB}"
+
+# Criando a pasta do projeto e movendo o arquivo do app para dentro dela
+!mkdir -p {NOME_REPOSITORIO}
+!mv app.py {NOME_REPOSITORIO}/ 2>/dev/null || cp app.py {NOME_REPOSITORIO}/
+
+# Entrando na pasta do projeto
+%cd {NOME_REPOSITORIO}
+
+# Criando o arquivo de requisitos (lista de bibliotecas que o projeto usa)
+with open("requirements.txt", "w") as f:
+    f.write("streamlit\ngoogle-genai\n")
+
+# Criando o README (A página de apresentação do seu projeto no GitHub)
+readme_content = f"""# ☕ Diário do Sommelier de Café Inteligente
+
+Este é um aplicativo web desenvolvido em **Python** utilizando a biblioteca **Streamlit** e integrado à API do **Google Gemini**. 
+
+O projeto captura a opinião do usuário sobre um café e utiliza Inteligência Artificial para gerar um parecer técnico e descontraído em tempo real.
+
+## 🛠️ Tecnologias Utilizadas
+- Python
+- Streamlit (Interface Web)
+- Google GenAI SDK (Gemini 2.5 Flash)
+
+## 🚀 Como Executar
+1. Instale as dependências: `pip install -r requirements.txt`
+2. Execute o app: `streamlit run app.py`
+"""
+with open("README.md", "w") as f:
+    f.write(readme_content)
+
+# ==========================================
+# 3. ENVIANDO OS ARQUIVOS PARA O GITHUB
+# ==========================================
+# Inicializa o repositório local
+!git init -b main
+
+# Adiciona todos os arquivos (app.py, README.md, requirements.txt)
+!git add .
+
+# Registra a alteração
+!git commit -m "Primeiro commit: Estrutura do app Sommelier IA com Streamlit"
+
+# Configura o link de destino usando seu Token de segurança de forma oculta
+URL_REMOTA = f"https://{TOKEN_GITHUB}@://github.com{USUARIO_GITHUB}/{NOME_REPOSITORIO}.git"
+!git remote add origin {URL_REMOTA} 2>/dev/null || git remote set-url origin {URL_REMOTA}
+
+# Envia tudo para o GitHub!
+print("\n📤 Enviando o projeto para o GitHub...")
+!git push -u origin main --force
+print("\n🎉 PARABÉNS! Seu projeto já está online no seu perfil do GitHub!")
+print(f"🔗 Acesse em: https://://github.com{USUARIO_GITHUB}/{NOME_REPOSITORIO}")
+
+GEMINI_API_KEY = "SUA_API_KEY_AQUI"
+
+import streamlit as st
+import google.genai as genai
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="Sommelier IA", page_icon="☕", layout="centered")
+
+st.title("☕ Diário do Sommelier de Café Inteligente")
+st.markdown("Diga o que achou do seu café e nossa IA dará um veredito de especialista!")
+
+# 2. CONEXÃO SEGURA COM A IA (Lendo das Secrets do Servidor)
+# O Streamlit busca automaticamente a chave 'GEMINI_API_KEY' salva no painel de controle
+try:
+    CHAVE_SEGURA = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=CHAVE_SEGURA)
+except Exception:
+    st.error("❌ Erro de Configuração: A chave 'GEMINI_API_KEY' não foi encontrada nas Secrets do Streamlit Cloud.")
+    st.stop()
+
+# 3. INTERFACE VISUAL LIMPA (Sem barra lateral de senha)
+nome_grao = st.text_input("Qual o nome ou marca do café?")
+nota = st.slider("De 1 a 5, qual nota você dá?", min_value=1, max_value=5, value=3)
+comentario = st.text_area("Descreva o sabor ou método de preparo (ex: prensa francesa, amargo, frutado):")
+
+# 4. BOTÃO DE ENVIO E PROCESSAMENTO
+if st.button("Analisar Café com IA 🚀"):
+    if nome_grao and comentario:
+        with st.spinner("🤖 O Sommelier de IA está degustando e pensando..."):
+            
+            # Montando a instrução para o Gemini
+            prompt = f"""
+            Você é um Sommelier de Café especialista e descontraído. 
+            Um usuário degustou o seguinte café:
+            - Nome/Marca: {nome_grao}
+            - Nota dada: {nota}/5
+            - Comentário: {comentario}
+
+            Gere um veredito técnico e divertido de até 3 linhas sobre essa experiência.
+            """
+            
+            try:
+                # Chamada de API utilizando o cliente configurado com a Secret
+                resposta = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=prompt,
+                )
+                
+                # Exibindo o resultado na tela de forma elegante
+                st.success("📊 PARECER DO SOMMELIER IA")
+                st.metric(label=f"Avaliação do {nome_grao}", value="⭐" * nota)
+                st.write(resposta.text)
+                
+            except Exception as e:
+                st.error(f"Erro ao processar a resposta da IA: {e}")
+    else:
+        st.warning("⚠️ Por favor, preencha o nome do grão e o comentário antes de analisar.")
+
+# Inicializa o histórico na memória do Streamlit se ele não existir
+if "historico" not in st.session_state:
+    st.session_state.historico = []
+
+# ... (dentro do botão de envio, logo após receber a resposta da IA):
+st.session_state.historico.append({
+    "Grão": nome_grao, 
+    "Nota": "⭐" * nota, 
+    "Veredito": resposta.text
+})
+
+# ... (no final do arquivo app.py, fora do botão):
+st.markdown("### 📜 Seu Histórico de Degustações")
+st.write(st.session_state.historico)
+
+import streamlit as st
+import google.genai as genai
+from PIL import Image
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="Sommelier IA Pro", page_icon="☕", layout="centered")
+
+st.title("☕ Sommelier de Café Pro com Visão Computacional")
+st.markdown("Envie uma foto do seu café (grão, moagem ou pacote) junto com seus comentários e a IA fará uma análise visual e sensorial completa!")
+
+# 2. CONEXÃO SEGURA COM A IA
+try:
+    CHAVE_SEGURA = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=CHAVE_SEGURA)
+except Exception:
+    st.error("❌ Erro de Configuração: A chave 'GEMINI_API_KEY' não foi encontrada nas Secrets.")
+    st.stop()
+
+# 3. INTERFACE DE ENTRADA DE DADOS
+nome_grao = st.text_input("Qual o nome ou marca do café?")
+nota = st.slider("De 1 a 5, qual nota você dá?", min_value=1, max_value=5, value=3)
+comentario = st.text_area("Descreva o sabor ou o método de preparo:")
+
+# NOVO COMPONENTE: Upload de Imagem (Aceita câmera do celular ou arquivo)
+foto_cafe = st.file_uploader("📸 Envie uma foto do grão, pó ou da embalagem (Opcional)", type=["jpg", "jpeg", "png"])
+
+if foto_cafe is not None:
+    # Abre e exibe a imagem na tela para o usuário ver
+    imagem_aberta = Image.open(foto_cafe)
+    st.image(imagem_aberta, caption="Sua foto carregada com sucesso!", use_container_width=True)
+
+# 4. BOTÃO DE ENVIO E PROCESSAMENTO MULTIMODAL
+if st.button("Analisar Café com Visão Computacional 🚀"):
+    if nome_grao and comentario:
+        with st.spinner("🤖 O Sommelier de IA está olhando a imagem e degustando..."):
+            
+            # Montando a lista de conteúdos que enviaremos para o Gemini
+            # A engenharia de software multimodal exige que passemos tanto textos quanto imagens em uma lista
+            conteudos_para_envio = []
+            
+            # Se o usuário enviou uma foto, adicionamos o arquivo de imagem na lista
+            if foto_cafe is not None:
+                conteudos_para_envio.append(imagem_aberta)
+                
+            # Adicionamos a instrução de texto (prompt) na lista
+            prompt = f"""
+            Você é um Sommelier de Café especialista e descontraído. 
+            Um usuário degustou o seguinte café:
+            - Nome/Marca: {nome_grao}
+            - Nota dada: {nota}/5
+            - Comentário do usuário: {comentario}
+
+            Caso o usuário tenha enviado uma foto anexa, faça uma análise visual dela (comente sobre o ponto da torra, o tipo de moagem se estiver em pó, ou o design/informações da embalagem se for o pacote).
+            Em seguida, junte a análise visual com as notas de sabor enviadas e dê um veredito final técnico e divertido de até 5 linhas.
+            """
+            conteudos_para_envio.append(prompt)
+            
+            try:
+                # Chamada de API Multimodal
+                resposta = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=conteudos_para_envio,
+                )
+                
+                # Exibindo o resultado elegante na tela
+                st.success("📊 ANÁLISE MULTIMODAL DO SOMMELIER IA")
+                st.metric(label=f"Avaliação do {nome_grao}", value="⭐" * nota)
+                st.write(resposta.text)
+                
+            except Exception as e:
+                st.error(f"Erro ao processar a resposta da IA: {e}")
+    else:
+        st.warning("⚠️ Por favor, preencha o nome do grão e o comentário antes de analisar.")
+
+import streamlit as st
+import google.genai as genai
+from PIL import Image
+import pandas as pd  # Biblioteca padrão de mercado para criar tabelas de dados
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="Sommelier IA Pro", page_icon="☕", layout="centered")
+
+st.title("☕ Sommelier de Café Pro com Histórico")
+st.markdown("Envie uma foto e a descrição do seu café para análise. Suas degustações ficarão salvas na tabela abaixo!")
+
+# NOVO: Inicializa a lista de histórico na memória da sessão se ela ainda não existir
+if "historico_degustacoes" not in st.session_state:
+    st.session_state.historico_degustacoes = []
+
+# 2. CONEXÃO SEGURA COM A IA
+try:
+    CHAVE_SEGURA = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=CHAVE_SEGURA)
+except Exception:
+    st.error("❌ Erro de Configuração: A chave 'GEMINI_API_KEY' não foi encontrada nas Secrets.")
+    st.stop()
+
+# 3. INTERFACE DE ENTRADA DE DADOS
+nome_grao = st.text_input("Qual o nome ou marca do café?")
+nota = st.slider("De 1 a 5, qual nota você dá?", min_value=1, max_value=5, value=3)
+comentario = st.text_area("Descreva o sabor ou o método de preparo:")
+
+foto_cafe = st.file_uploader("📸 Envie uma foto do grão, pó ou da embalagem (Opcional)", type=["jpg", "jpeg", "png"])
+
+if foto_cafe is not None:
+    imagem_aberta = Image.open(foto_cafe)
+    st.image(imagem_aberta, caption="Sua foto carregada com sucesso!", use_container_width=True)
+
+# 4. BOTÃO DE ENVIO E PROCESSAMENTO MULTIMODAL
+if st.button("Analisar Café com Visão Computacional 🚀"):
+    if nome_grao and comentario:
+        with st.spinner("🤖 O Sommelier de IA está analisando tudo..."):
+            
+            conteudos_para_envio = []
+            if foto_cafe is not None:
+                conteudos_para_envio.append(imagem_aberta)
+                
+            prompt = f"""
+            Você é um Sommelier de Café especialista e descontraído. 
+            Um usuário degustou o seguinte café:
+            - Nome/Marca: {nome_grao}
+            - Nota dada: {nota}/5
+            - Comentário do usuário: {comentario}
+
+            Gere um veredito técnico e divertido de até 3 linhas sobre essa experiência.
+            """
+            conteudos_para_envio.append(prompt)
+            
+            try:
+                resposta = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=conteudos_para_envio,
+                )
+                
+                # Exibindo o resultado atual imediato na tela
+                st.success("📊 ANÁLISE DO SOMMELIER IA")
+                st.metric(label=f"Avaliação do {nome_grao}", value="⭐" * nota)
+                st.write(resposta.text)
+                
+                # NOVO: Adicionando esta degustação na nossa lista de histórico
+                st.session_state.historico_degustacoes.append({
+                    "Café/Marca": nome_grao,
+                    "Nota": "⭐" * nota,
+                    "Seu Comentário": comentario,
+                    "Veredito da IA": resposta.text
+                })
+                
+            except Exception as e:
+                st.error(f"Erro ao processar a resposta da IA: {e}")
+    else:
+        st.warning("⚠️ Por favor, preencha o nome do grão e o comentário antes de analisar.")
+
+# ==========================================
+# 5. NOVO: EXIBIÇÃO DA TABELA DE HISTÓRICO
+# ==========================================
+st.markdown("---")
+st.markdown("### 📜 Seu Histórico de Degustações desta Sessão")
+
+if st.session_state.historico_degustacoes:
+    # Transforma nossa lista de dicionários em uma tabela estruturada do Pandas DataFrame
+    df_historico = pd.DataFrame(st.session_state.historico_degustacoes)
+    
+    # Exibe a tabela de forma bonita e interativa na interface web
+    st.dataframe(
+        df_historico, 
+        use_container_width=True,
+        hide_index=True  # Esconde a coluna de números automáticos (0, 1, 2...)
+    )
+    
+    # Botão bônus para limpar o histórico
+    if st.button("Limpar Histórico 🗑️"):
+        st.session_state.historico_degustacoes = []
+        st.rerun()
+else:
+    st.info("Nenhum café analisado ainda nesta sessão. Suas análises aparecerão aqui!")
+
+
