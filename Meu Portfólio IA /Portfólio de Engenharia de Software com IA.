@@ -1,0 +1,322 @@
+import streamlit as st
+import google.genai as genai
+import pandas as pd
+import io
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="FinAI - Automação Financeira", page_icon="💰", layout="wide")
+
+st.title("💰 FinAI - Analisador e Gerador de Planilhas Financeiras com IA")
+st.markdown("Cole sua lista de gastos bagunçada e deixe que a IA organize, categorize e gere sua planilha do Excel automaticamente!")
+
+# 2. CONEXÃO SEGURA COM A IA
+try:
+    CHAVE_SEGURA = st.secrets["GEMINI_API_KEY"]
+    client = genai.Client(api_key=CHAVE_SEGURA)
+except Exception:
+    st.error("❌ Erro de Configuração: A chave 'GEMINI_API_KEY' não foi encontrada nas Secrets.")
+    st.stop()
+
+# 3. INTERFACE VISUAL
+st.subheader("📝 Cole seus gastos abaixo")
+st.caption("Exemplo: 'Comprei R\$ 50 de gasolina ontem, gastei 120 no mercado na quinta e 35 no ifood hoje'")
+texto_gastos = st.text_area("Descreva seus gastos do mês de forma livre:", height=150)
+
+# 4. BOTÃO DE PROCESSAMENTO E AUTOMAÇÃO
+if st.button("Categorizar Gastos e Gerar Planilha 🚀"):
+    if texto_gastos.strip():
+        with st.spinner("🤖 A IA está analisando, limpando e categorizando seus gastos..."):
+            
+            # Prompt exigindo dados em formato CSV para facilitar a automação via Pandas
+            prompt_financas = f"""
+            Você é um analista financeiro sênior e especialista em engenharia de dados.
+            Analise o seguinte texto livre de gastos e extraia cada item listando: Descrição, Categoria (use apenas: Alimentação, Transporte, Lazer, Saúde, Moradia ou Outros) e Valor (apenas o número, usando ponto para decimais).
+
+            Sua resposta deve ser EXCLUSIVAMENTE uma tabela no formato CSV legítimo, utilizando a vírgula (,) como separador de colunas. Não inclua nenhuma outra palavra, introdução, markdown (como ```csv) ou explicação. A primeira linha deve ser o cabeçalho.
+            
+            Cabeçalho obrigatório:
+            Descricao,Categoria,Valor
+
+            Texto dos gastos:
+            {texto_gastos}
+            """
+            
+            try:
+                resposta = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=prompt_financas,
+                )
+                
+                # Remove espaços em branco ou blocos de código markdown residuais da resposta da IA
+                dados_csv = resposta.text.strip().replace("```csv", "").replace("```", "")
+                
+                # ---- ENGENHARIA DE DADOS TRADICIONAL (Conversão de String para DataFrame) ----
+                # Usamos io.StringIO para fazer o Pandas ler o texto puro como se fosse um arquivo de verdade
+                df_gastos = pd.read_csv(io.StringIO(dados_csv))
+                
+                # Garante que a coluna Valor seja tratada como número de verdade
+                df_gastos['Valor'] = pd.to_numeric(df_gastos['Valor'], errors='coerce')
+                df_gastos = df_gastos.dropna() # Remove linhas que deram erro
+                
+                # 5. EXIBIÇÃO DOS RESULTADOS (Métricas, Gráficos e Tabelas)
+                st.success("🎉 Seus dados foram automatizados com sucesso!")
+                
+                col_met, col_graf = st.columns([1, 2])
+                
+                with col_met:
+                    st.markdown("### 📊 Resumo do Mês")
+                    total_gasto = df_gastos['Valor'].sum()
+                    st.metric("Total de Gastos", f"R$ {total_gasto:.2f}")
+                    
+                    st.markdown("#### Tabela Organizada")
+                    st.dataframe(df_gastos, use_container_width=True, hide_index=True)
+                
+                with col_graf:
+                    st.markdown("### 📈 Gastos por Categoria")
+                    # Agrupa os valores por categoria para gerar o gráfico
+                    df_categorias = df_gastos.groupby('Categoria')['Valor'].sum().reset_index()
+                    
+                    # Gera um gráfico de barras nativo e interativo
+                    st.bar_chart(data=df_categorias, x='Categoria', y='Valor', use_container_width=True)
+                
+                # ---- 6. EXPORTAÇÃO AUTOMATIZADA PARA EXCEL/CSV ----
+                st.markdown("---")
+                st.subheader("📥 Baixar Sua Planilha Pronta")
+                
+                # Converte o DataFrame limpo de volta para uma string CSV pronta para download
+                csv_para_baixar = df_gastos.to_csv(index=False).encode('utf-8')
+                
+                st.download_button(
+                    label="📥 Baixar Planilha para o Excel (.csv)",
+                    data=csv_para_baixar,
+                    file_name="meu_planejamento_finai.csv",
+                    mime="text/csv"
+                )
+                
+            except Exception as e:
+                st.error(f"Erro ao processar e automatizar os dados financeiros: {e}. Certifique-se de colar os gastos em um formato legível.")
+    else:
+        st.warning("⚠️ Por favor, digite ou cole algum gasto para analisar.")
+
+import streamlit as st
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="Portfólio | Engenheiro de Software IA", page_icon="💻", layout="centered")
+
+# 2. CABEÇALHO DO PERFIL
+st.title("🙋‍♂️ Olá, eu sou o [SEU NOME AQUI]")
+st.subheader("Engenheiro de Software Especialista em Integração de IA")
+
+st.markdown("""
+Seja bem-vindo ao meu portfólio de projetos práticos. Meu foco é projetar sistemas modernos 
+que unem a engenharia de software tradicional (Python, Bancos de Dados) ao poder da 
+Inteligência Artificial Generativa e Computação em Nuvem.
+""")
+
+# Links de Redes Sociais rápidos
+col_redes1, col_redes2 = st.columns(2)
+with col_redes1:
+    st.markdown("🔗 **LinkedIn:** [Acesse meu Perfil](https://linkedin.com)")
+with col_redes2:
+    st.markdown("📁 **GitHub:** [Acesse meu Repositório](https://github.com)")
+
+st.markdown("---")
+st.header("🚀 Meus Projetos em Produção")
+st.markdown("Todos os sistemas abaixo foram desenvolvidos do zero, versionados no GitHub e hospedados em nuvem.")
+
+# ==========================================
+# PROJECT 1: SOMMELIER IA PRO
+# ==========================================
+with st.container(border=True):
+    st.subheader("☕ 1. Sommelier de Café Pro (Visão Computacional)")
+    st.markdown("""
+    **O que faz:** Uma aplicação inteligente que utiliza IA multimodal para analisar imagens de grãos de café, moagens ou embalagens, gerando um veredito técnico e descontraído combinado a notas sensoriais do usuário.
+    
+    **Diferencial Técnico:** Implementação de visão computacional através da biblioteca PIL e fusão de mídias estruturadas na API do Gemini.
+    """)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button("🌐 Abrir Aplicativo", "https://streamlit.app", use_container_width=True)
+    with col2:
+        st.link_button("📁 Código no GitHub", "https://github.com/sommelier-cafe-ia", use_container_width=True)
+
+# ==========================================
+# PROJECT 2: FITAI PRO
+# ==========================================
+with st.container(border=True):
+    st.subheader("🏋️‍♂️ 2. FitAI Pro (Persistência em Banco de Dados)")
+    st.markdown("""
+    **O que faz:** Um assistente virtual de saúde que calcula métricas físicas como o IMC e gera cronogramas completos de treino e planejamentos alimentares, salvando o histórico permanentemente.
+    
+    **Diferencial Técnico:** Uso de banco de dados relacional **SQLite** nativo em Python, algoritmos de fatiamento de strings (parsing) para separação de abas e exportação de dados para download de arquivos (.txt).
+    """)
+    col1, col2 = columns_fit = st.columns(2)
+    with col1:
+        st.link_button("🌐 Abrir Aplicativo", "https://streamlit.app", use_container_width=True)
+    with col2:
+        st.link_button("📁 Código no GitHub", "https://github.com/fit-ai-gerador", use_container_width=True)
+
+# ==========================================
+# PROJECT 3: FINAI
+# ==========================================
+with st.container(border=True):
+    st.subheader("💰 3. FinAI (Automação & Engenharia de Dados)")
+    st.markdown("""
+    **O que faz:** Um automatizador de finanças pessoais que lê listas de gastos digitadas de forma totalmente bagunçada, extrai os valores brutos, classifica-os por categorias e plota gráficos analíticos de despesas.
+    
+    **Diferencial Técnico:** Criação de pipelines de dados automatizados, manipulação e agregação de dados com a biblioteca **Pandas** e geração de planilhas exportáveis (.csv) compatíveis com o Excel.
+    """)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button("🌐 Abrir Aplicativo", "https://streamlit.app", use_container_width=True)
+    with col2:
+        st.link_button("📁 Código no GitHub", "https://github.com/fin-ai-automacao", use_container_width=True)
+
+st.markdown("---")
+st.caption("⚡ Desenvolvido de forma moderna com Python e Streamlit.")
+
+streamlit
+
+# ==========================================================
+# 1. PREENCHA SUAS INFORMAÇÕES DO GITHUB AQUI
+# ==========================================================
+USUARIO_GITHUB = "SEU_USUARIO_AQUI"
+EMAIL_GITHUB = "seu_email@email.com"
+TOKEN_GITHUB = "seu_token_github_aqui"  # O seu Token de Acesso Pessoal (PAT)
+NOME_REPOSITORIO = "meu-portfolio-ia"   # Nome do repositório central
+
+# ==========================================================
+# 2. ESTRUTURANDO A PASTA E OS ARQUIVOS DO PORTFÓLIO
+# ==========================================================
+# Configurando o Git no ambiente virtual do Colab
+!git config --global user.name "{USUARIO_GITHUB}"
+!git config --global user.email "{EMAIL_GITHUB}"
+
+# Criando o diretório isolado do projeto
+!mkdir -p {NOME_REPOSITORIO}
+%cd {NOME_REPOSITORIO}
+
+# Escrevendo o arquivo requirements.txt
+with open("requirements.txt", "w") as f:
+    f.write("streamlit\n")
+
+# Escrevendo o arquivo principal app.py do Portfólio Central
+portfolio_code = f"""import streamlit as st
+
+# 1. CONFIGURAÇÃO DA PÁGINA WEB
+st.set_page_config(page_title="Portfólio | Engenheiro de Software IA", page_icon="💻", layout="centered")
+
+# 2. CABEÇALHO DO PERFIL
+st.title("🙋‍♂️ Olá, eu sou o [SEU NOME AQUI]")
+st.subheader("Engenheiro de Software Especialista em Integração de IA")
+
+st.markdown(\"\"\"
+Seja bem-vindo ao meu portfólio de projetos práticos. Meu foco é projetar sistemas modernos 
+que unem a engenharia de software tradicional (Python, Bancos de Dados) ao poder da 
+Inteligência Artificial Generativa e Computação em Nuvem.
+\"\"\")
+
+# Links Rápidos
+col_redes1, col_redes2 = st.columns(2)
+with col_redes1:
+    st.markdown("🔗 **LinkedIn:** [Acesse meu Perfil](https://linkedin.com{USUARIO_GITHUB})")
+with col_redes2:
+    st.markdown("📁 **GitHub:** [Acesse meu Repositório](https://github.com{USUARIO_GITHUB})")
+
+st.markdown("---")
+st.header("🚀 Meus Projetos em Produção")
+st.markdown("Todos os sistemas abaixo foram desenvolvidos do zero, versionados no GitHub e hospedados em nuvem.")
+
+# PROJECT 1: SOMMELIER IA PRO
+with st.container(border=True):
+    st.subheader("☕ 1. Sommelier de Café Pro (Visão Computacional)")
+    st.markdown(\"\"\"
+    **O que faz:** Uma aplicação inteligente que utiliza IA multimodal para analisar imagens de grãos de café, moagens ou embalagens, gerando um veredito técnico e descontraído combinado a notas sensoriais do usuário.
+    
+    **Diferencial Técnico:** Implementação de visão computacional através da biblioteca PIL e fusão de mídias estruturadas na API do Gemini.
+    \"\"\")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button("🌐 Abrir Aplicativo", "https://{USUARIO_GITHUB}-sommelier.streamlit.app", use_container_width=True)
+    with col2:
+        st.link_button("📁 Código no GitHub", "https://github.com{USUARIO_GITHUB}/sommelier-cafe-ia", use_container_width=True)
+
+# PROJECT 2: FITAI PRO
+with st.container(border=True):
+    st.subheader("🏋️‍♂️ 2. FitAI Pro (Persistência em Banco de Dados)")
+    st.markdown(\"\"\"
+    **O que faz:** Um assistente virtual de saúde que calcula métricas físicas como o IMC e gera cronogramas completos de treino e planejamentos alimentares, salvando o histórico permanentemente.
+    
+    **Diferencial Técnico:** Uso de banco de dados relacional **SQLite** nativo em Python, algoritmos de fatiamento de strings (parsing) para separação de abas e exportação de dados para download de arquivos (.txt).
+    \"\"\")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button("🌐 Abrir Aplicativo", "https://{USUARIO_GITHUB}-fitai.streamlit.app", use_container_width=True)
+    with col2:
+        st.link_button("📁 Código no GitHub", "https://github.com{USUARIO_GITHUB}/fit-ai-gerador", use_container_width=True)
+
+# PROJECT 3: FINAI
+with st.container(border=True):
+    st.subheader("💰 3. FinAI (Automação & Engenharia de Dados)")
+    st.markdown(\"\"\"
+    **O que faz:** Um automatizador de finanças pessoais que lê listas de gastos digitadas de forma totalmente bagunçada, extrai os valores brutos, classifica-os por categorias e plota gráficos analíticos de despesas.
+    
+    **Diferencial Técnico:** Criação de pipelines de dados automatizados, manipulação e agregação de dados com a biblioteca **Pandas** e geração de planilhas exportáveis (.csv) compatíveis com o Excel.
+    \"\"\")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button("🌐 Abrir Aplicativo", "https://{USUARIO_GITHUB}-finai.streamlit.app", use_container_width=True)
+    with col2:
+        st.link_button("📁 Código no GitHub", "https://github.com{USUARIO_GITHUB}/fin-ai-automacao", use_container_width=True)
+
+st.markdown("---")
+st.caption("⚡ Desenvolvido de forma moderna com Python e Streamlit.")
+"""
+
+with open("app.py", "w") as f:
+    f.write(portfolio_code)
+
+# Criando o arquivo README.md de apresentação do Portfólio Central
+readme_content = f"""# 💻 Meu Portfólio Central - Engenharia de Software com IA
+
+Este repositório centraliza o acesso e a documentação dos principais sistemas inteligentes que desenvolvi. 
+
+Todas as aplicações integradas aqui utilizam **Python**, **Streamlit Cloud** para hospedagem e o SDK do **Google Gemini** para processamento de inteligência artificial generativa, inteligência multimodal e automação de engenharia de dados.
+"""
+with open("README.md", "w") as f:
+    f.write(readme_content)
+
+# ==========================================================
+# 3. ENVIANDO PARA O REPOSITÓRIO REMOTO NO GITHUB
+# ==========================================================
+!git init -b main
+!git add .
+!git commit -m "Initial commit: Estrutura do portfólio central unificado"
+
+URL_REMOTA = f"https://{TOKEN_GITHUB}@://github.com{USUARIO_GITHUB}/{NOME_REPOSITORIO}.git"
+!git remote add origin {URL_REMOTA} 2>/dev/null || git remote set-url origin {URL_REMOTA}
+
+print("\n📤 Subindo o Portfólio Central para o seu GitHub...")
+!git push -u origin main --force
+print(f"\n🎉 CONCLUÍDO COM SUCESSO!")
+print(f"🔗 Veja no seu GitHub: https://github.com{USUARIO_GITHUB}/{NOME_REPOSITORIO}")
+
+st.title("🙋‍♂️ Olá, eu sou o [Seu Nome Completo]")
+st.subheader("Engenheiro de Software | Especialista em Integração de IA e Dados")
+
+st.markdown("""
+Sou um desenvolvedor focado em projetar, construir e automatizar sistemas modernos que resolvem problemas reais de negócio. Minha atuação combina os pilares da **Engenharia de Software Clássica** com o poder da **Inteligência Artificial Generativa e Computação em Nuvem**.
+
+Tenho experiência prática no desenvolvimento de pipelines funcionais e aplicações ponta a ponta, utilizando conceitos avançados do ecossistema de tecnologia atual:
+
+### 🛠️ Competências Técnicas em Destaque:
+
+* **Desenvolvimento e Lógica:** Proficiência em **Python**, focado na escrita de códigos limpos, modulares e eficientes, além do uso de frameworks ágeis como o **Streamlit** para criação rápida de interfaces web responsivas.
+* **Inteligência Artificial & LLMs:** Integração de modelos de linguagem de última geração através do **Google GenAI SDK** (Gemini), com domínio prático em **Engenharia de Prompt Estruturada** e desenvolvimento de soluções com **IA Multimodal (Texto e Visão Computacional)**.
+* **Engenharia & Manipulação de Dados:** Tratamento, limpeza, agregação e análise de dados estruturados e não-estruturados utilizando a biblioteca **Pandas**, além do desenvolvimento de algoritmos de fatiamento de strings (*Parsing*) para processamento de saídas complexas de IA.
+* **Persistência & Armazenamento:** Modelagem e gerenciamento de bancos de dados relacionais utilizando **SQL** e **SQLite** nativo, garantindo integridade e persistência de dados (*CRUD*).
+* **Automação & Cloud:** Criação de fluxos automáticos de exportação de dados (geração de arquivos estruturados .TXT e .CSV integrados com Excel), controle de versão profissional via **GitHub** e gerenciamento de infraestrutura em nuvem segura utilizando variáveis de ambiente ocultas (*Secrets*).
+
+*Acredito que o papel do engenheiro moderno mudou: nosso desafio não é apenas escrever linhas manuais de código, mas sim orquestrar componentes inteligentes para gerar valor e impacto real em produção.*
+""")
+
